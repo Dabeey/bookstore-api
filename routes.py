@@ -2,7 +2,8 @@ from fastapi import APIRouter, HTTPException, status, Depends
 from models import Book
 from database import get_db
 from sqlalchemy.orm import Session
-from schemas import BookCreate
+from schemas import BookCreate, ShowBook
+from typing import List
 
 
 router = APIRouter(
@@ -10,7 +11,7 @@ router = APIRouter(
     tags=['Books']
 )
 
-@router.get('')
+@router.get('', response_model= List[ShowBook])
 def all_books(db: Session = Depends(get_db)):
     books = db.query(Book).all()
     if not books:
@@ -19,7 +20,7 @@ def all_books(db: Session = Depends(get_db)):
     return books
 
 
-@router.post('', status_code=status.HTTP_201_CREATED)
+@router.post('', status_code=status.HTTP_201_CREATED, response_model=ShowBook)
 def create_book(request: BookCreate, db: Session = Depends(get_db)):
     book_instance = Book(title=request.title, description=request.description,author=request.author, year=request.year)
     db.add(book_instance)
@@ -28,7 +29,7 @@ def create_book(request: BookCreate, db: Session = Depends(get_db)):
     return book_instance
 
 
-@router.get('/{id}', status_code=status.HTTP_200_OK)
+@router.get('/{id}', status_code=status.HTTP_200_OK, response_model=ShowBook)
 def show_book(id:int, db: Session = Depends(get_db)):
     book_instance = db.query(Book).filter(Book.id == id).first()
 
@@ -38,8 +39,8 @@ def show_book(id:int, db: Session = Depends(get_db)):
     return book_instance
 
 
-@router.get('/{id}', status_code=status.HTTP_204_NO_CONTENT)
-def delete(id:int, db: Session = Depends(get_db)):
+@router.delete('/{id}', status_code=status.HTTP_204_NO_CONTENT)
+def delete_book(id:int, db: Session = Depends(get_db)):
     book = db.query(Book).filter(Book.id == id).delete(synchronize_session=False)
 
     if not book:
@@ -49,7 +50,7 @@ def delete(id:int, db: Session = Depends(get_db)):
     return f'Deleted blog with id {id}'
 
 
-@router.post('/{id}', status_code=status.HTTP_202_ACCEPTED)
+@router.put('/{id}', status_code=status.HTTP_202_ACCEPTED, response_model=ShowBook)
 def update_book(request:BookCreate, id:int, db: Session = Depends(get_db)):
     book = db.query(Book).filter(Book.id == id)
 
@@ -58,6 +59,7 @@ def update_book(request:BookCreate, id:int, db: Session = Depends(get_db)):
 
     book.update(request.model_dump())
     db.commit()
+    db.refresh(book.first())
     return book.first()
 
 

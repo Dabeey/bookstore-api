@@ -12,7 +12,7 @@ class BookCreate(BookBase):
     pass
 
 
-class Book(BookBase):
+class ShowBook(BookBase):
     id: int
 
     class config:
