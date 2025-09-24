@@ -1,27 +1,28 @@
-from sqlalchemy.orm import sessionmaker,  DeclarativeBase
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy import create_engine
 import os
+from dotenv import load_dotenv
 
-DATABASE_URL = os.getenv('SQLALCHEMY_DATABASE_URL')
+load_dotenv()
 
-engine = create_async_engine(DATABASE_URL, echo=True)
+DATABASE_URL = os.getenv('SQLALCHEMY_DATABASE_URL', 'postgresql+asyncpg://dabeey:password@localhost:5432/bookstore')
 
-AsyncSessionLocal = sessionmaker(
+engine = create_engine(DATABASE_URL, echo=True)
+
+SessionLocal = sessionmaker(
     bind=engine,
     autoflush=False,
     autocommit=False,
-    class_=AsyncSession,
-    expire_on_commit=False
 )
 
-Base = DeclarativeBase()
+Base = declarative_base()
 
-async def get_db():
-    async with AsyncSessionLocal() as db:
-        try:
-            yield db
-        finally:
-            db.close()
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 
 def create_table():
