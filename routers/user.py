@@ -11,7 +11,7 @@ router = APIRouter(
     tags=['Users']
 )
 
-@router.post('', status_code=status.HTTP_201_CREATED)
+@router.post('', response_class=ShowUser, status_code=status.HTTP_201_CREATED)
 def create_user(request: UserCreate, db: Session = Depends(get_db)):
     new_user = User(name = request.name, email = request.email, password = Hash.bcrypt(request.password))
     db.add(new_user)
@@ -20,8 +20,8 @@ def create_user(request: UserCreate, db: Session = Depends(get_db)):
     return new_user
 
 
-@router.get('', status_code=status.HTTP_200_OK)
-def get_user(id: int, db: Session):
+@router.get('', status_code=status.HTTP_200_OK, response_class=ShowUser)
+def get_user(id: int, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.id==id).first()
 
     if not user:
