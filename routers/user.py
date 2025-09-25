@@ -4,6 +4,7 @@ from database import get_db
 from sqlalchemy.orm import Session
 from schemas import UserCreate, ShowUser
 from typing import List
+from repositories import user
 
 
 router = APIRouter(
@@ -11,16 +12,13 @@ router = APIRouter(
     tags=['Users']
 )
 
-@router.post('', response_class=ShowUser, status_code=status.HTTP_201_CREATED)
-def create_user(request: UserCreate, db: Session = Depends(get_db)):
-    new_user = User(name = request.name, email = request.email, password = Hash.bcrypt(request.password))
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
-    return new_user
+
+@router.post('', response_model=ShowUser, status_code=status.HTTP_201_CREATED)
+def create(request: UserCreate, db: Session = Depends(get_db)):
+    return user.create_user(request, db)
 
 
-@router.get('', status_code=status.HTTP_200_OK, response_class=ShowUser)
+@router.get('', status_code=status.HTTP_200_OK, response_model=ShowUser)
 def get_user(id: int, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.id==id).first()
 
