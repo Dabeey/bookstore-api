@@ -8,6 +8,7 @@ class BookBase(BaseModel):
     description: str
     year: int
 
+
 class UserBase (BaseModel):
     name: str
     email: str
