@@ -9,3 +9,8 @@ class Book(Base):
     description = Column(String, index=True)
     author = Column(String, index=True)
     year = Column(Integer)
+
+
+class User(Base):
+    __tablename__ = 'users'
+    id = colum
