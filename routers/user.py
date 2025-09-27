@@ -18,10 +18,6 @@ def create(request: UserCreate, db: Session = Depends(get_db)):
     return user.create_user(request, db)
 
 
-@router.get('', status_code=status.HTTP_200_OK, response_model=ShowUser)
-def get_user(id: int, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.id==id).first()
-
-    if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'User with id {id} not found.')
-    return user
+@router.get('/{id}', status_code=status.HTTP_200_OK, response_model=ShowUser)
+def get(id: int, db: Session = Depends(get_db)):
+    return user.get_user(id, db)

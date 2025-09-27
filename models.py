@@ -1,6 +1,6 @@
 from database import Base
 from sqlalchemy import Column, Integer, String
-
+from sqlalchemy.orm import relationship
 
 class Book(Base):
     __tablename__='Books'
@@ -9,6 +9,8 @@ class Book(Base):
     description = Column(String, index=True)
     author = Column(String, index=True)
     year = Column(Integer)
+
+    readers = relationship('User', back_populates='blogs')
 
 
 class User(Base):
