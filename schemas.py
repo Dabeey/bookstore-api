@@ -50,7 +50,7 @@ class ShowUser(UserBase):
 
 
 class ShowBook(BookBase):
-    reader = ShowUser
+    reader: ShowUser
 
     class config:
         from_attribute = True
